@@ -1,2 +1,1 @@
-# Emergency
-Boton de emergencia para Bender
+# Emergency button
