@@ -38,8 +38,6 @@ void loop() {
   
   // Try again 1s later
   delay(50);
-
-  Serial.println("NUEVO CODIGO");
   
 } 
 
