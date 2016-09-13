@@ -1,7 +1,7 @@
 #include <SPI.h>
 #include "RF24.h"
-int LedMessage=5 ;
-int LedAlarm=6;
+int LedMessage=6;
+int LedAlarm=5;
 unsigned long CounterWD=0;
 int limitWD=6000;
 /****************** User Config ***************************/
@@ -29,17 +29,19 @@ void setup() {
 
 void loop() {
     float got_voltage;   
-    if( radio.available()){
+    if( radio.available() ){
       digitalWrite(LedAlarm,HIGH);                                                                
       while (radio.available()) {                                                                 
         radio.read( &got_voltage, sizeof(float) );
         Serial.println(got_voltage);                  
       }
       if (got_voltage>=3.5)  {
-        digitalWrite(LedMessage,LOW);
+        digitalWrite(LedMessage,HIGH);
+        Serial.println("QueSUCEDE");
       }
       else {
-        digitalWrite(LedMessage,HIGH);
+        digitalWrite(LedMessage,LOW);
+        Serial.println("NADASUCEDE");
       }
       radio.stopListening();                                        // First, stop listening so we can talk   
       radio.write( &got_voltage, sizeof(char) );              // Send the final one back.      
