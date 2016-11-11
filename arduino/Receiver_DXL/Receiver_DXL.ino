@@ -34,8 +34,8 @@ class ReceiverDXL: public DeviceDXL<RECEIVER_MODEL, RECEIVER_FIRMWARE, RECEIVER_
     led_qos_(led_qos),          // QOS Led
     radio_(radio),            
     led_message_(led_message),  
-    counter_WD(0),              // Watchdog Counter, useful in the measure of QOS
-    limit_WD(6000),             // Upper Watchdog Counter Limit, it can be modified.
+    counter_WD_(0),              // Watchdog Counter, useful in the measure of QOS
+    limit_WD_(6000),             // Upper Watchdog Counter Limit, it can be modified.
     
     status_(MMap::Access::RW, MMap::Storage::RAM) // Led command
     {
@@ -109,15 +109,15 @@ class ReceiverDXL: public DeviceDXL<RECEIVER_MODEL, RECEIVER_FIRMWARE, RECEIVER_
         radio_->stopListening(); 
         radio_->write( &got_voltage, sizeof(int16_t) ); 
         radio_->startListening();
-        counter_WD = 0;
+        counter_WD_ = 0;
      }
 
      
-     counter_WD = counter_WD+1;       // Increase WatchdogCounter in each iteration
-     if(counter_WD >= limit_WD)       // If reaches a the limit value, turn off the QOS Led.
+     counter_WD_ = counter_WD_+ 1;       // Increase WatchdogCounter in each iteration
+     if(counter_WD_ >= limit_WD_)       // If reaches a the limit value, turn off the QOS Led.
      {
         digitalWrite(led_qos_, LOW);
-        counter_WD = limit_WD+1;      
+        counter_WD_ = limit_WD_ + 1;      
      }
     }
 
@@ -149,8 +149,8 @@ class ReceiverDXL: public DeviceDXL<RECEIVER_MODEL, RECEIVER_FIRMWARE, RECEIVER_
     const uint8_t led_message_;  // Message Pin
     float float_raw;
     
-    unsigned long counter_WD;   // Watchdog Counter
-    int limit_WD;               // Upper Watchdog Counter Limit
+    unsigned long counter_WD_;   // Watchdog Counter
+    int limit_WD_;               // Upper Watchdog Counter Limit
 
     // Radio
     RF24* radio_;
