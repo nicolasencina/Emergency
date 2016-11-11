@@ -25,9 +25,9 @@ void setup() {
 
 void loop() {
   radio.stopListening();                                    // First, stop listening so we can talk.
-  float enviar = (5.0 / 1023) * analogRead(botonAnalog);                            
+  int16_t enviar = analogRead(botonAnalog);                            
 
-  boolean intento=radio.write( &enviar, sizeof(float) );
+  boolean intento=radio.write( &enviar, sizeof(int16_t) );
 
   if (intento){
     digitalWrite(LedPin1, LOW);
