@@ -8,7 +8,7 @@
 // LED DXL basic config
 #define RECEIVER_MODEL 100
 #define RECEIVER_FIRMWARE 100
-#define RECEIVER_MMAP_SIZE 2 // Use 1 variable
+#define RECEIVER_MMAP_SIZE 2 // Use 2 variable
 
 
 # define CE_PIN 4           // SPI connections pins
@@ -18,6 +18,11 @@
 # define DATA_CONTROL 7     
 # define RESET_PIN 10
 
+
+uint8_t call_counter = 0;
+uint8_t radio_available_counter = 0;  
+uint32_t rate = 50; 
+float QOS;
 /**
  * @brief Basic RF receiver using DXL communication protocol
  *
@@ -76,22 +81,34 @@ class ReceiverDXL: public DeviceDXL<RECEIVER_MODEL, RECEIVER_FIRMWARE, RECEIVER_
 
       //Initial setting to start the communication
       radio_->begin();
-      radio_->setPALevel(RF24_PA_LOW);                // Working Power Level of the RF Module
+      radio_->setPALevel(RF24_PA_HIGH);                // Working Power Level of the RF Module
       radio_->openWritingPipe(this->ADDRESSES[1]);    // Set the communications paths
       radio_->openReadingPipe(1,this->ADDRESSES[0]);  
       radio_->startListening();
       
     }
 
-
-
     void update()
     {
+
+      static uint32_t current = millis();
+      if (millis() - current < rate) {
+        return;
+      }
+
+      current = millis();
+
+      radio_available_counter = call_counter > 254 ? 0 : radio_available_counter;
+      call_counter = call_counter > 254 ?  0 : call_counter + 1;
+      
+      
       int16_t got_voltage;   // Float variable to receive the transmitted voltage
          
       if( radio_->available() )           
       {
+        radio_available_counter = radio_available_counter + 1;
         digitalWrite(led_qos_, HIGH);     // If there is communnication, turn on QOS led                                                           
+        
         while (radio_->available())   
         {
           radio_->read( &got_voltage, sizeof(int16_t) );    // Get Message               
@@ -114,6 +131,9 @@ class ReceiverDXL: public DeviceDXL<RECEIVER_MODEL, RECEIVER_FIRMWARE, RECEIVER_
         radio_->startListening();
         counter_WD_ = 0;
      }
+
+     QOS = (call_counter - radio_available_counter)/call_counter;
+     Serial.println( QOS );
 
 
      //Serial.println(counter_WD_);
